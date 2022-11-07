@@ -25,10 +25,15 @@ class Kripto:
 
 k1=Kripto()
 sig=k1.sign("bok")
-print(int.from_bytes(k1.sk.to_string(), byteorder='big'))
-print(int.from_bytes(k1.vk.to_string(), byteorder='big'))
-print(sig)
-print(k1.verify(sig,"bok"))
+
+print(k1.sk.to_string())
+temp=int.from_bytes(k1.sk.to_string(), byteorder='big')
+print(temp)
+temp2=temp.to_bytes(24,'big')
+print(temp2)
+
+#print(sig)
+#print(k1.verify(sig,"bok"))
 
 
 
