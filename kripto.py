@@ -1,31 +1,34 @@
-from ecdsa import SigningKey
-
-sk = SigningKey.generate() # uses NIST192p
-vk = sk.verifying_key
-signature = sk.sign(b"message")
-#print(signature.decode())
-assert vk.verify(signature, b"message")
-
+from ecdsa import SigningKey, BadSignatureError
 
 class Kripto:
     def __init__(self):
         self.sk = SigningKey.generate() # uses NIST192p
-        self.vk = sk.verifying_key
+        self.vk = self.sk.verifying_key
+       # with open("private.pem", "wb") as f:
+       #     f.write(sk.to_pem())
+       # with open("public.pem", "wb") as f:
+       #     f.write(vk.to_pem())
 
     def sign(self,message):   #ocekujem string
-        byteString = bytes(message, 'utf-8')
-        signature = sk.sign(byteString)
+        byteString = message.encode()
+        signature = self.sk.sign(byteString)
         self.signature=signature
         return signature
 
     def verify(self, signature, message):
-        byteString = bytes(message, 'utf-8')
-        print(vk.verify(signature, byteString))
+        byteString = message.encode()
+        try:
+             self.vk.verify(signature, byteString)
+             return True
+        except BadSignatureError:
+             return False
 
 k1=Kripto()
 sig=k1.sign("bok")
+print(int.from_bytes(k1.sk.to_string(), byteorder='big'))
+print(int.from_bytes(k1.vk.to_string(), byteorder='big'))
 print(sig)
-k1.verify(sig,"bok")
+print(k1.verify(sig,"bok"))
 
 
 
