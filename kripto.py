@@ -1,7 +1,7 @@
 from ecdsa import SigningKey, BadSignatureError
 import shamirs
 
-class Kripto:
+class Korisnik:
     def __init__(self):
         self.sk = SigningKey.generate() # uses NIST192p
         self.vk = self.sk.verifying_key
@@ -19,7 +19,7 @@ class Kripto:
         for i in self.ss:
             print(i)
 
-        print(shamirs.interpolate(self.ss[0:2],threshold=3))
+        print(shamirs.interpolate(self.ss[0:3],threshold=3))
 
 
 
@@ -40,7 +40,7 @@ class Kripto:
 
 
 
-k1=Kripto()
+k1=Korisnik()
 sig=k1.sign("bok")
 
 #print(k1.sk.to_string())
