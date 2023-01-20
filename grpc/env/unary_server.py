@@ -3,7 +3,7 @@ from concurrent import futures
 import time
 import unary_pb2_grpc as pb2_grpc
 import unary_pb2 as pb2
-
+import kripto as Crypto
 
 class UnaryService(pb2_grpc.UnaryServicer):
 

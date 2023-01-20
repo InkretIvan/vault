@@ -16,9 +16,9 @@ class Korisnik:
 
         self.ss = shamirs.shares(sk_int, quantity=5, modulus=silly_big_prime, threshold=3)
 
-        for i in self.ss:
-            print(i)
-
+        #for i in self.ss:
+        #    print(i)
+        #
         print(shamirs.interpolate(self.ss[0:3],threshold=3))
 
 
@@ -46,11 +46,11 @@ sig=k1.sign("bok")
 #print(k1.sk.to_string())
 temp=int.from_bytes(k1.sk.to_string(), byteorder='big')
 print(temp)
-#temp2=temp.to_bytes(24,'big')
-#print(temp2)
+temp2=temp.to_bytes(24,'big')
+print(temp2)
 
-#print(sig)
-#print(k1.verify(sig,"bok"))
+print(sig)
+print(k1.verify(sig,"bok"))
 
 
 
