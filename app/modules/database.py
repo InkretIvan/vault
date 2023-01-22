@@ -1,4 +1,5 @@
 import psycopg2
+import psycopg2.extras
 
 DB_HOST="localhost"
 DB_USER="postgres"
@@ -25,11 +26,11 @@ class db():
 
         print("db conncted")
 
-        self.cur1=self.conn1.cursor()
-        self.cur2=self.conn2.cursor()
-        self.cur3=self.conn3.cursor()
-        self.cur4=self.conn4.cursor()
-        self.cur5=self.conn5.cursor()
+        self.cur1=self.conn1.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        self.cur2=self.conn2.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        self.cur3=self.conn3.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        self.cur4=self.conn4.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        self.cur5=self.conn5.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     def closeTheDB(self):
         self.cur1.close()
@@ -43,6 +44,60 @@ class db():
         self.conn3.close()
         self.conn4.close()
         self.conn5.close()
+
+    def retrieveKeyById(self,id):
+        counter=0
+        ss=[]
+        try:
+            self.cur1.execute("select * from keyfragment where id=%s",(id,))
+            ss.append(self.cur1.fetchone()['fragment'])
+            counter=counter+1
+        except:
+            print("node 1 offline")
+
+        try:
+            self.cur2.execute("select * from keyfragment where id=%s",(id,))
+            ss.append(self.cur2.fetchone()['fragment'])
+            counter=counter+1
+        except:
+            print("node 2 offline")
+
+        try:
+            self.cur3.execute("select * from keyfragment where id=%s",(id,))
+            ss.append(self.cur3.fetchone()['fragment'])
+            counter=counter+1
+        except:
+            print("node 3 offline")
+
+        try:
+            self.cur4.execute("select * from keyfragment where id=%s",(id,))
+            ss.append(self.cur4.fetchone()['fragment'])
+            counter=counter+1
+        except:
+            print("node 4 offline")
+
+        try:
+            self.cur5.execute("select * from keyfragment where id=%s",(id,))
+            ss.append(self.cur5.fetchone()['fragment'])
+            counter=counter+1
+        except:
+            print("node 5 offline")
+        if counter < 3:
+            return 0
+        return ss
+
+    def purgeDB(self):
+        self.cur1.execute("delete from keyfragment")
+        self.cur2.execute("delete from keyfragment")
+        self.cur3.execute("delete from keyfragment")
+        self.cur4.execute("delete from keyfragment")
+        self.cur5.execute("delete from keyfragment")
+
+        self.conn1.commit()
+        self.conn2.commit()
+        self.conn3.commit()
+        self.conn4.commit()
+        self.conn5.commit()
 
     def checkNodesStatus(self):
         counter=0

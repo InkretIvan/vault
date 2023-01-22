@@ -12,8 +12,6 @@ class Key:
         vk = sk.verifying_key
         #with open("private.pem", "wb") as f:   # ako budem trebal spremiti na disk
         #    f.write(self.sk.to_pem())
-        #with open("public.pem", "wb") as f:
-        #    f.write(self.vk.to_pem())
 
         sk_int = int.from_bytes(sk.to_string(), byteorder='big')
 
@@ -28,7 +26,9 @@ class Key:
 
         del sk, sk_int, ss
 
-        return ss64
+        ret=[vk,ss64]
+
+        return ret
         
 
 
@@ -51,10 +51,9 @@ class Key:
 
         #print(shamirs.interpolate(lll[0:4],threshold=3))
 
-    def sign(self,message):   #ocekujem string
+    def sign(self,sk,message):   #ocekujem string
         byteString = message.encode()
-        signature = self.sk.sign(byteString)
-        self.signature=signature
+        signature = sk.sign(byteString)
         return signature
 
     def verify(self, signature, message):
