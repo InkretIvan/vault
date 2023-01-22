@@ -9,71 +9,96 @@ DB3_NAME="node3"
 DB4_NAME="node4"
 DB5_NAME="node5"
 
-conn1=psycopg2.connect(dbname=DB1_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-conn2=psycopg2.connect(dbname=DB2_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-conn3=psycopg2.connect(dbname=DB3_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-conn4=psycopg2.connect(dbname=DB4_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-conn5=psycopg2.connect(dbname=DB5_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
-cur1=conn1.cursor()
-cur2=conn2.cursor()
-cur3=conn3.cursor()
-cur4=conn4.cursor()
-cur5=conn5.cursor()
+class db():
 
+    def __init__(self):
 
+        self.status=[1,1,1,1,1]
 
-conn1.commit()
-conn2.commit()
-conn3.commit()
-conn4.commit()
-conn5.commit()
+        print("DB initiated")
+        self.conn1=psycopg2.connect(dbname=DB1_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        self.conn2=psycopg2.connect(dbname=DB2_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        self.conn3=psycopg2.connect(dbname=DB3_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        self.conn4=psycopg2.connect(dbname=DB4_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        self.conn5=psycopg2.connect(dbname=DB5_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
-def initTheDB():
-    print("bok")
+        print("db conncted")
 
-def closeTheDB():
-    cur1.close()
-    cur2.close()
-    cur3.close()
-    cur4.close()
-    cur5.close()
+        self.cur1=self.conn1.cursor()
+        self.cur2=self.conn2.cursor()
+        self.cur3=self.conn3.cursor()
+        self.cur4=self.conn4.cursor()
+        self.cur5=self.conn5.cursor()
 
-    conn1.close()
-    conn2.close()
-    conn3.close()
-    conn4.close()
-    conn5.close()
+    def closeTheDB(self):
+        self.cur1.close()
+        self.cur2.close()
+        self.cur3.close()
+        self.cur4.close()
+        self.cur5.close()
 
-def checkNodesStatus():
-    try:
-        cur1.execute("select * from keyfragment")
-        print("1 ok")
-    except:
-        print("1 dcd")
+        self.conn1.close()
+        self.conn2.close()
+        self.conn3.close()
+        self.conn4.close()
+        self.conn5.close()
 
-    try:
-        cur2.execute("select * from keyfragment")
-        print("2 ok")
-    except:
-        print("2 dcd")
+    def checkNodesStatus(self):
+        counter=0
+        try:
+            self.cur1.execute("select * from keyfragment")
+            print("node 1 online")
+            counter=counter+1
+        except:
+            print("node 1 offline")
 
-    try:
-        cur3.execute("select * from keyfragment")
-        print("3 ok")
-    except:
-        print("3 dcd")
+        try:
+            self.cur2.execute("select * from keyfragment")
+            print("node 2 online")
+            counter=counter+1
+        except:
+            print("node 2 offline")
 
-    try:
-        cur4.execute("select * from keyfragment")
-        print("4 ok")
-    except:
-        print("4 dcd")
+        try:
+            self.cur3.execute("select * from keyfragment")
+            print("node 3 online")
+            counter=counter+1
+        except:
+            print("node 3 offline")
 
-    try:
-        cur5.execute("select * from keyfragment")
-        print("5 ok")
-    except:
-        print("5 dcd")
+        try:
+            self.cur4.execute("select * from keyfragment")
+            print("node 4 online")
+            counter=counter+1
+        except:
+            print("node 4 offline")
 
-closeTheDB()
+        try:
+            self.cur5.execute("select * from keyfragment")
+            print("node 5 online")
+            counter=counter+1
+        except:
+            print("node 5 offline")
+        return counter
+
+    def saveFragments(self,fragmentId,fragments):
+        if self.checkNodesStatus()!=5:
+            print("not all nodes are active, can't save shares")
+            return 0
+        #print(fragmentId)
+        #print(fragments)
+        self.cur1.execute("insert into keyfragment (id, fragment) values (%s,%s)",(fragmentId,fragments[0]))
+        self.cur2.execute("insert into keyfragment (id, fragment) values (%s,%s)",(fragmentId,fragments[1]))
+        self.cur3.execute("insert into keyfragment (id, fragment) values (%s,%s)",(fragmentId,fragments[2]))
+        self.cur4.execute("insert into keyfragment (id, fragment) values (%s,%s)",(fragmentId,fragments[3]))
+        self.cur5.execute("insert into keyfragment (id, fragment) values (%s,%s)",(fragmentId,fragments[4]))
+
+        self.conn1.commit()
+        self.conn2.commit()
+        self.conn3.commit()
+        self.conn4.commit()
+        self.conn5.commit()
+        return 1
+    
+
