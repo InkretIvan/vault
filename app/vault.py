@@ -1,4 +1,5 @@
 from ecdsa import SigningKey, VerifyingKey, BadSignatureError
+from ecdsa.util import sigdecode_string, sigencode_string, sigencode_der
 from modules.database import *
 from modules.kripto import *
 
@@ -13,6 +14,11 @@ def printHelp():
     print("-sign [id] [message.txt]")
     print("  signs the message with the key [id] belongs to")
     print("  example: sign 123456 text.txt")
+    print("-nodestatus")
+    print("  while simulating faults on nodes, show which ones are active")
+    print("-toggle [id]")
+    print("  while simulating faults on nodes, disable/enable a specific node")
+    print("  example: toggle 3")
     print("-purge")
     print("  deletes all keys from the database")
     print("-exit")
@@ -29,7 +35,7 @@ def main():
                 printHelp()
 
             case "nodestatus":
-                print("status")
+                database.showStatus()
 
             case "test": #just for testing purposes
                 id=int(inp2[1])
@@ -47,6 +53,11 @@ def main():
 
             case "purge":
                 database.purgeDB()
+
+            case "toggle":
+                id=int(inp2[1])
+                database.changeNodeStatus(id)
+                database.showStatus()
 
             case "sign":
                 id=int(inp2[1])
@@ -68,16 +79,17 @@ def main():
                 sk_reconstructed=SigningKey.from_string(sk_bytes)
 
                 #signature=recKey.sign(sk_reconstructed,message)
-                signature=sk_reconstructed.sign(message.encode())
+                signature=sk_reconstructed.sign(message.encode(),sigencode=sigencode_string)
                 
-                with open("signed_"+messagepath, "a") as f:   
+                with open("signed_"+messagepath, "w") as f:   
                     f.write(message)
                     f.write("\n")
-                
-                with open("signed_"+messagepath, "ab") as f:   
+                    f.write("Signature: ")
+
+                with open("signed_"+messagepath, "ba") as f:   
                     f.write(signature)
 
-
+                print("signed",messagepath,"with key with id ",id)
 
 
             case "generate":

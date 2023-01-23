@@ -17,14 +17,14 @@ class db():
 
         self.status=[1,1,1,1,1]
 
-        print("DB initiated")
+        #print("DB initiated")
         self.conn1=psycopg2.connect(dbname=DB1_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         self.conn2=psycopg2.connect(dbname=DB2_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         self.conn3=psycopg2.connect(dbname=DB3_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         self.conn4=psycopg2.connect(dbname=DB4_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         self.conn5=psycopg2.connect(dbname=DB5_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
-        print("db conncted")
+        #print("db conncted")
 
         self.cur1=self.conn1.cursor(cursor_factory=psycopg2.extras.DictCursor)
         self.cur2=self.conn2.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -45,43 +45,60 @@ class db():
         self.conn4.close()
         self.conn5.close()
 
+    def showStatus(self):
+        i=1
+        for s in self.status:
+            if s==1:
+                print("node ",i," working")
+            else:
+                print("node ",i," disabled")
+            i=i+1
+
+    def changeNodeStatus(self,nodeId):
+        self.status[nodeId-1]=(self.status[nodeId-1]+1)%2   
+        
     def retrieveKeyById(self,id):
         counter=0
         ss=[]
-        try:
-            self.cur1.execute("select * from keyfragment where id=%s",(id,))
-            ss.append(self.cur1.fetchone()['fragment'])
-            counter=counter+1
-        except:
-            print("node 1 offline")
+        if self.status[0]==1:
+            try:
+                self.cur1.execute("select * from keyfragment where id=%s",(id,))
+                ss.append(self.cur1.fetchone()['fragment'])
+                counter=counter+1
+            except:
+                print("node 1 offline")
 
-        try:
-            self.cur2.execute("select * from keyfragment where id=%s",(id,))
-            ss.append(self.cur2.fetchone()['fragment'])
-            counter=counter+1
-        except:
-            print("node 2 offline")
+        if self.status[1]==1:
+            try:
+                self.cur2.execute("select * from keyfragment where id=%s",(id,))
+                ss.append(self.cur2.fetchone()['fragment'])
+                counter=counter+1
+            except:
+                print("node 2 offline")
 
-        try:
-            self.cur3.execute("select * from keyfragment where id=%s",(id,))
-            ss.append(self.cur3.fetchone()['fragment'])
-            counter=counter+1
-        except:
-            print("node 3 offline")
+        if self.status[2]==1:
+            try:
+                self.cur3.execute("select * from keyfragment where id=%s",(id,))
+                ss.append(self.cur3.fetchone()['fragment'])
+                counter=counter+1
+            except:
+                print("node 3 offline")
 
-        try:
-            self.cur4.execute("select * from keyfragment where id=%s",(id,))
-            ss.append(self.cur4.fetchone()['fragment'])
-            counter=counter+1
-        except:
-            print("node 4 offline")
+        if self.status[3]==1:
+            try:
+                self.cur4.execute("select * from keyfragment where id=%s",(id,))
+                ss.append(self.cur4.fetchone()['fragment'])
+                counter=counter+1
+            except:
+                print("node 4 offline")
 
-        try:
-            self.cur5.execute("select * from keyfragment where id=%s",(id,))
-            ss.append(self.cur5.fetchone()['fragment'])
-            counter=counter+1
-        except:
-            print("node 5 offline")
+        if self.status[4]==1:
+            try:
+                self.cur5.execute("select * from keyfragment where id=%s",(id,))
+                ss.append(self.cur5.fetchone()['fragment'])
+                counter=counter+1
+            except:
+                print("node 5 offline")
         if counter < 3:
             return 0
         return ss
@@ -103,35 +120,35 @@ class db():
         counter=0
         try:
             self.cur1.execute("select * from keyfragment")
-            print("node 1 online")
+            #print("node 1 online")
             counter=counter+1
         except:
             print("node 1 offline")
 
         try:
             self.cur2.execute("select * from keyfragment")
-            print("node 2 online")
+            #print("node 2 online")
             counter=counter+1
         except:
             print("node 2 offline")
 
         try:
             self.cur3.execute("select * from keyfragment")
-            print("node 3 online")
+            #print("node 3 online")
             counter=counter+1
         except:
             print("node 3 offline")
-
+            
         try:
             self.cur4.execute("select * from keyfragment")
-            print("node 4 online")
+            #print("node 4 online")
             counter=counter+1
         except:
             print("node 4 offline")
 
         try:
             self.cur5.execute("select * from keyfragment")
-            print("node 5 online")
+            #print("node 5 online")
             counter=counter+1
         except:
             print("node 5 offline")
