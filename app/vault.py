@@ -1,5 +1,5 @@
 from ecdsa import SigningKey, VerifyingKey, BadSignatureError
-from ecdsa.util import sigdecode_string, sigencode_string, sigencode_der
+from ecdsa.util import sigdecode_string, sigencode_string, sigencode_der, sigdecode_der
 from modules.database import *
 from modules.kripto import *
 
@@ -14,9 +14,9 @@ def printHelp():
     print("-sign [id] [message.txt]")
     print("  signs the message with the key [id] belongs to")
     print("  example: sign 123456 text.txt")
-    print("-verify [public.pem] [message.txt]")
+    print("-verify [public.pem] [message.txt] [signature]")
     print("  verify if the message with the key [public.pem] is correctly signed")
-    print("  example: verify public123456.pem text.txt")
+    print("  example: verify public123456.pem text.txt signature.sig")
     print("-nodestatus")
     print("  while simulating faults on nodes, show which ones are active")
     print("-toggle [id]")
@@ -65,19 +65,25 @@ def main():
             case "verify":
                 vk_file=inp2[1]
                 messagepath=inp2[2]
+                sig_file=inp2[3]
 
-                with open(messagepath, "rb") as f:   
+                with open(messagepath, "r") as f:   
                     msg=f.read()
 
                 with open(vk_file, "r") as f:   
                     vk_pem=f.read()
 
-                msg_split=msg.split("Signature: ")
+                with open(sig_file, "rb") as f:   
+                    signature=f.read()
+
                 vk=VerifyingKey.from_pem(vk_pem)
-                msg=msg_split[0]
-                signature=msg_split[1]
-                print(msg)
-                print(signature)
+
+                try:
+                    vk.verify(signature, msg.encode(), sigdecode=sigdecode_der)
+                    print("This is signed correctly!")
+                except BadSignatureError:
+                    print("This signature is faulty")
+
 
             case "sign":
                 id=int(inp2[1])
@@ -99,14 +105,10 @@ def main():
                 sk_reconstructed=SigningKey.from_string(sk_bytes)
 
                 #signature=recKey.sign(sk_reconstructed,message)
-                signature=sk_reconstructed.sign(message.encode(),sigencode=sigencode_string)
-                
-                with open("signed_"+messagepath, "w") as f:   
-                    f.write(message)
-                    f.write("\n")
-                    f.write("Signature: ")
+                signature=sk_reconstructed.sign(message.encode(),sigencode=sigencode_der)
 
-                with open("signed_"+messagepath, "ba") as f:   
+
+                with open("signature_"+str(id)+".sig", "wb") as f:   
                     f.write(signature)
 
                 print("signed",messagepath,"with key with id ",id)

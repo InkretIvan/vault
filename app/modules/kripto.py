@@ -10,8 +10,6 @@ class Key:
     def generateKey(self):
         sk = SigningKey.generate() # uses NIST192p
         vk = sk.verifying_key
-        #with open("private.pem", "wb") as f:   # ako budem trebal spremiti na disk
-        #    f.write(self.sk.to_pem())
 
         sk_int = int.from_bytes(sk.to_string(), byteorder='big')
 
