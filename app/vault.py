@@ -14,6 +14,9 @@ def printHelp():
     print("-sign [id] [message.txt]")
     print("  signs the message with the key [id] belongs to")
     print("  example: sign 123456 text.txt")
+    print("-verify [public.pem] [message.txt]")
+    print("  verify if the message with the key [public.pem] is correctly signed")
+    print("  example: verify public123456.pem text.txt")
     print("-nodestatus")
     print("  while simulating faults on nodes, show which ones are active")
     print("-toggle [id]")
@@ -58,6 +61,23 @@ def main():
                 id=int(inp2[1])
                 database.changeNodeStatus(id)
                 database.showStatus()
+
+            case "verify":
+                vk_file=inp2[1]
+                messagepath=inp2[2]
+
+                with open(messagepath, "rb") as f:   
+                    msg=f.read()
+
+                with open(vk_file, "r") as f:   
+                    vk_pem=f.read()
+
+                msg_split=msg.split("Signature: ")
+                vk=VerifyingKey.from_pem(vk_pem)
+                msg=msg_split[0]
+                signature=msg_split[1]
+                print(msg)
+                print(signature)
 
             case "sign":
                 id=int(inp2[1])
